@@ -1197,3 +1197,337 @@ $.getJSON(url +'assertion/?callback=?', function(asserts){
 		net.draw();
 	} 
 });
+
+	
+	me.saveLinesToTitan = function(){
+		me.lines.forEach(function(line){
+			if (line._titan_id === undefined){
+				var cSvg1 = d3.select(line.source);
+				var cSvg2 = d3.select(line.target);
+				
+				var cInd1 = indexOfObj(me.circles, cSvg1.attr('class'), 'class');
+				var cInd2 = indexOfObj(me.circles, cSvg2.attr('class'), 'class');
+				
+				line.source = me.circles[cInd1]._titan_id;
+				line.target = me.circles[cInd2]._titan_id;
+				if ( cId1 !== undefined && cId2 !== undefined ) {
+					$.ajax({
+						type: 'POST',
+						url : buildEdge(line),
+						dataType: 'application/json',
+						success: function(r){
+							console.log(r);
+						},
+						error: function(e){
+							var resp = JSON.parse(e.responseText);
+							
+							if (resp.message === undefined){
+								var lObj = me.lines[indexOfObj(me.lines, 
+									resp.results.class,	'class')];
+								lObj._titan_id = JSON.parse(e.responseText).results._id;
+								console.log(JSON.parse(e.responseText).results._id);
+							}	
+						}
+					});
+				}
+			}
+		});
+	};
+	
+	me.saveAssertionsToTitan = function(){
+		me.saveCirclesToTitan(target_event._titan_id);
+		setTimeout(me.saveLinesToTitan, 5000);
+	};
+	
+	me.grab = function(start, end){
+		var cCount = 0;
+		var lCount = 0;
+		var mCount = 0;
+		$.ajax({
+			type: 'GET',
+			url: 'http://everest-build:8081/assertion/',
+			success: function(data){
+				console.log('success');
+				console.log(data.length);
+				for (var i = start; i < end; i++){
+				//data.forEach(function(as){
+					var as = data[i];
+					var metadata = {
+						mongo_ar_id: as.alpha_report_id,
+						mongo_rep_id: as.reporter_id,
+						createdDate: as.createdDate,
+						updatedDate: as.updatedDate,
+						type: 'metadata',
+						name: 'alpha report',
+						count: mCount
+					};
+					
+					var mInd = indexOfObj(m_Array, metadata.mongo_ar_id, 'mongo_ar_id');
+					if (mInd === -1){
+						m_Array.push(metadata);
+						mCount++;
+					} else {
+						metadata.count = m_Array[mInd].count;
+					}
+					
+					var entity1 = {
+						mongo_ar_id: as.alpha_report_id,
+						mongo_assert_id: as._id,
+						name: as.entity1,
+						type: 'entity1',
+						color: me.entity1Color,
+						mCount: metadata.count,
+						count: cCount++
+					};
+					
+					var entity2 = {
+						mongo_ar_id: as.alpha_report_id,
+						mongo_assert_id: as._id,
+						name: as.entity2,
+						type: 'entity2',
+						color: me.entity2Color,
+						mCount: metadata.count,
+						count: cCount++
+					};
+					
+					var relationship = {
+						mongo_ar_id: as.alpha_report_id,
+						mondo_assert_id: as._id,
+						_label: as.relationship,
+						source: entity1.count,
+						target: entity2.count
+					};
+					
+					var mInd = indexOfObj(m_Array, metadata.mongo_ar_id, 'mongo_ar_id');
+					if (mInd === -1){
+						m_Array.push(metadata);
+					} 
+					c_Array[entity1.count] = entity1;
+					c_Array[entity2.count] = entity2;
+					l_Array.push(relationship);
+				//});
+				}
+			},
+			error: function(error){
+				//console.log('error');
+				//console.log(error);
+			}
+		});
+	};
+	
+	me.saveCircles = function(){
+		m_Array.forEach(function(meta){
+			if (meta._titan_id === undefined){
+				postCircle(meta);
+			}
+		});
+	
+		c_Array.forEach(function(circle){
+			if (circle._titan_id === undefined){
+				postCircle(circle);
+			}
+		});
+	};
+	
+	me.saveLines = function(){
+		l_Array.forEach(function(line, i){
+			//console.log(i);
+			if (line._titan_id === undefined){
+				line.source = c_Array[line.source]._titan_id;
+				line.target = c_Array[line.target]._titan_id;
+				postLine(line);
+			}
+		});
+		
+		m_Array.forEach(function(meta){
+			//grab all circles with same ar_id
+			c_Array.forEach(function(circ){
+				if (circ.mongo_ar_id === meta.mongo_ar_id){
+					postLine({source:meta._titan_id, target:circ._titan_id, _label: 'meta of'});
+				}
+			});
+		});
+	}
+};
+
+function postCircle(cObj){
+	$.ajax({
+		type: 'POST',
+		url: buildNode(cObj),
+		success: function(resp){
+			cObj._titan_id = resp.results._id;
+			return cObj._titan_id;
+		},
+		error: function(e){
+			//console.log(e);
+		}
+	});
+};
+
+function postLine(lObj){
+	$.ajax({
+		type: 'POST',
+		url: buildEdge(lObj),
+		success: function(resp){
+			lObj._titan_id = resp.results._id;
+		},
+		error: function(e){
+			//console.log(e);
+		}
+	});
+};
+
+
+me.saveCirclesToTitan = function(m_id){
+	me.circles.forEach(function(circle){
+		$.ajax({
+			type: 'POST', 
+			url: buildNode(circle),
+			dataType: 'application/json',
+			success: function(r){
+				console.log(r);
+			},
+			error: function(e){
+				var resp = JSON.parse(e.responseText);
+				if (resp.message === undefined){
+					var cObj = me.circles[indexOfObj(me.circles, 
+						resp.results.name,	'd')];
+					cObj._titan_id = resp.results._id;
+				
+				
+					$.ajax({
+						type: 'POST',
+						url: buildEdge(m_id, cObj._titan_id, {d: 'metadata', class: 'random'}),
+						dataType: 'application/json',
+						success: function(r){ console.log(r); },
+						error: function(e){ console.log(JSON.parse(e.responseText)); }
+					});
+				}
+			}
+		});			
+	});
+};
+
+$.ajax({
+	type: 'GET',
+	dataType: 'application/json',
+	url: url + 'alpha-report/',
+	success: function(data) {
+		console.log('success');
+		data.forEach(function(ar){
+			d3.select('.alphas').append('option').text(ar._id);
+		});
+		me.alpha_reports = data;
+	},
+	error: function(e){
+		var data = JSON.parse(e.responseText);
+		data.forEach(function(ar){
+			d3.select('.alphas').append('option').text(ar._id);
+		});
+		me.alpha_reports = data;
+	},
+	complete: function(){
+		if ( me.alpha_reports.length > 0 ){
+			var ar = me.alpha_reports[0];
+			me.displayAlphaReportInfo(ar);
+			me.getAssertions(ar._id);
+		}
+	}			
+});
+
+$.ajax({
+	type: 'GET',
+	dataType: 'json',
+	url: url + 'target_event/?callback=?',
+	success: function(data) {
+		if (data[0] !== undefined){
+			me.target_events = data;
+			data.forEach(function(te){
+				d3.select('.patterns').append('option').text(te._id);
+			});
+		}
+	},
+	error: function(e){
+		console.log(e);
+	},
+	complete: function(){
+		if (me.target_events.length !== 0){
+			me.getTargetAssertions(me.target_events[0]._id);
+		}
+	}			
+});
+
+$.ajax({
+	type: 'GET',
+	dataType: 'json',
+	url: url + 'target_assertion/?callback=?',
+	success: function(data) {
+		data.forEach(function(ta){
+			if ( event.assertions.indexOf(ta._id.toString()) !== -1 ) {
+				me.target_assertions.push(ta);
+				
+				maxX = Math.max(maxX, ta.entity1[0].x);
+				maxY = Math.max(maxY, ta.entity1[0].y);
+				
+				if (a.entity2[0] !== undefined){
+					maxX = Math.max(maxX, ta.entity2[0].x);
+					maxY = Math.max(maxY, ta.entity2[0].y);
+				}
+			}
+		});
+	},
+	complete: function(){
+		me.displayTargetEventInfo(event);
+		me.te_view.draw(me.target_assertions, maxX, maxY);
+	}			
+});
+		
+$.ajax({
+	type: "POST",
+	url: url+'confirmed_report/',
+	dataType: 'application/json',
+	data: me.confirmed,
+	success: function(r){
+		console.log(r);
+	}
+});
+
+$.ajax({
+	type: 'GET',
+	dataType: 'application/json',
+	url: url + 'assertion/?callback=?',
+	success: function(data) {
+		me.assertions = data;
+		data.forEach(function(as){
+			if (as.alpha_report_id === ar_id){
+				assertions.push(as);
+				me.curr_assert_ids.push(as._id);
+			}
+		});
+	},
+	error: function(e){
+		var data = JSON.parse(e.responseText);
+		me.assertions = data;
+		data.forEach(function(as){
+			if (as.alpha_report_id === ar_id){
+				assertions.push(as);
+				me.curr_assert_ids.push(as._id);
+			}
+		});
+	},
+	complete: function(){
+		me.svg_asserts.remove();
+		me.svg_asserts = d3.select('.asserts')
+			.append('svg')
+			.attr('width', me.width)
+			.attr('height', me.height);
+		
+		me.svg_asserts.append('g')
+			.attr('class', 'node-link-container');
+				
+		if (assertions.length !== 0){
+			var net = new network(me.svg_asserts, assertions, false);
+			net.draw();
+		} 
+	}			
+});

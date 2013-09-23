@@ -29,6 +29,7 @@ for (int i = 0; i < vertices.size(); i++){
     for (int j = 0; j < metadata.size(); j++){
         if (vertices[i].get('mongo_ar_id') == metadata[j].get('mongo_ar_id')){
            graph.v(v.id).addEdge('metadata of', graph.v(metadata[j]._titan_id));
+           vertices[i].meta_titan_id = metadata[j]._titan_id;
         }
     }
 }

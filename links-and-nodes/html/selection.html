@@ -1,0 +1,164 @@
+<div ng-form="geoForm" 
+	name="geoForm" 
+	ng-app="LinksandNodes" >
+    
+	<div class="well">
+		<div class="heading"> Area of Interest </div>
+		</br>
+		<div class="fluid-container">
+		
+			<div class="control-group">
+
+				<div class="controls">
+					<div class="row-fluid">
+		
+			<!-- Circle -->
+						<div class="control-group">
+							<label class="control-label">Name:</label>
+							<div class="controls">
+								<div class="row-fluid">
+									<input class="geoCoordinateInput span12"
+										name="lineWidth"
+										placeholder="Name" type="text"
+										id="nameSearch" value="alpha report" />
+								</div>
+							</div>
+							<label class="control-label">Start:</label>
+							<div class="controls">
+								<div class="row-fluid">
+									<input class="geoCoordinateInput span6"
+										name="lineWidth"
+										placeholder="Start" type="text"
+										id="nodeStart" value="0" />
+								</div>
+							</div>
+					
+							<label class="control-label">End:</label>
+							<div class="controls">
+								<div class="row-fluid">
+									<input class="geoCoordinateInput span6"
+										placeholder="End" type="text"
+										id="nodeEnd" value="10"/>
+								</div>
+							</div>
+							
+							<input type="checkbox" name="vert" id="vert"> Include only nodes </input>
+							
+							<div class="controls">
+								<div class="row-fluid">
+									<button class="btn btn-inverse span5" ng-click="showQuery();">Query</button>
+                                </div>
+							</div>
+						</div>
+                <!-- /Circle -->                
+					</div>
+				</div>
+			</div>
+			
+  
+		</div>
+	</div>
+	
+	<div class="well">
+        <!-- Node -->
+		<div class="heading"> Node Query </div>
+		</br>
+		<div class="fluid-container">
+		
+			<div class="control-group">
+
+				<div class="controls">
+					<div class="row-fluid">
+
+						<div class="control-group">
+							<label class="control-label">Node ID:</label>
+							<div class="controls">
+								<div class="row-fluid">
+									<input class="geoCoordinateInput span12"
+										name="vertexId"
+										placeholder="ID" type="text"
+										id="vertexId" />
+								</div>
+							</div>
+					
+							<label class="control-label">Hops:</label>
+							<div class="controls">
+								<div class="row-fluid">
+									<input class="geoCoordinateInput span12"
+										placeholder="Hops" type="text"
+										id="hops" value="2"/>
+								</div>
+							</div>
+							
+							<div class="controls">
+								<div class="row-fluid">
+                                    <button class="btn btn-inverse span5" ng-click="showVertexQuery();">Query</button>
+                                </div>
+							</div>
+						</div>              
+					</div>
+				</div>
+			</div>
+            <!-- /Vertex -->  
+    </div>
+    </div>
+
+	<div class="well">
+
+		<div class="heading"> Graph Controls </div>
+		</br>
+		<div class="fluid-container">
+		
+			<div class="control-group">
+
+				<div class="controls">
+					<div class="row-fluid">
+
+						<div class="control-group">
+							<label class="control-label" span10>Curve Factor:</label>
+							<div class="controls">
+								<div class="row-fluid input-append">
+									<input class="geoCoordinateInput span6"
+										name="factor"
+										placeholder="Factor" type="text"
+										id="factor" value="1" />
+									<button class="btn btn-inverse " ng-click="redrawLinks();">Update</button>
+								</div>
+							</div>
+							
+							
+						</div>          
+					</div>
+				</div>
+			</div>
+			
+		<div class="fluid-container">
+		
+			<div class="control-group">
+
+				<div class="controls">
+					<div class="row-fluid">
+
+						<div class="control-group">
+							<div class="controls">
+
+								<input type="checkbox" id="labels" checked="checked" ng-model="labels" ng-change="toggleLabels();"> Display Labels </input>
+								<div class="row-fluid">
+			                        <button class="btn btn-inverse span5" ng-click="clearGraph();">Clear</button>
+			                    </div>
+			                    
+			                    <br />
+			                    
+								<div class="row-fluid">
+                                    <button class="btn btn-inverse span10" ng-click="loadGods();">Graph of the Gods</button>
+                                </div>
+							</div>
+						</div>          
+					</div>
+				</div>
+			</div>
+
+    </div>
+</div>
+
+</div>

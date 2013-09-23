@@ -80,20 +80,20 @@ request('http://everest-build:8081/assertion/', function(error, response, body){
 		});
 	}
 	var json;
-	if (limit === undefined){
+	//if (limit === undefined){
 		json = {
 			metadata : metadata,
 			vertices : vertices,
 			edges	 : edges
 		};
-	} else {
+	/*} else {
 		json = {
 			metadata : metadata.slice(0,limit),
 			vertices : vertices.slice(0,2*limit),
 			edges	 : edges.slice(0,limit)
 		};
 	}
-	
+	*/
 	fs.writeFile('./json/assertions.json', JSON.stringify(json), function(err){
 		if(err){
 			console.log(err);

@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>Links and Nodes</title>
+ 
+    <!-- Are these needed? They arent used yet.
+    <script type="text/javascript" src="/ses/js/ses-all.js"></script>
+    <script type="text/javascript" src="/O4Common/O4Common.debug.js"></script>
+    -->
+
+    <script src="../lib/angular-ui/ieshiv.js"></script>
+    <!-- Underscore - JS library for utility functions that might not be supported in IE -->
+    <script src="../lib/underscore/underscore-min.js"></script>
+    <script src="../lib/es5/es5-shim.js"></script>
+    <!-- JSON3 polyfill for old IE support -->
+    <!--[if lt IE 8]>
+    <script src="../lib/json3/json3.min.js"></script>
+    <![endif]-->
+
+    <!-- JQuery -->
+    <script src="../lib/jquery/jquery-debug.js"></script>
+    <script src="../lib/jquery/jquery-ui.js"></script>
+    <link rel="stylesheet" href="../lib/jquery/themes/smoothness/jquery-ui.css" type="text/css"/>
+    
+    <!-- JQuery Add Ons-->
+    <script src="../lib/jquery/jquery.placeholder.js"></script>
+   	<script src="../lib/jquery-sliderAccess/jquery-ui-sliderAccess.js"></script>
+    <script src="../lib/moment/moment.js"></script>
+
+    <!-- Angular -->
+    <script src="../lib/angular/angular.js"></script>
+    <script src="../lib/angular/resource.js"></script>
+    <script src="../lib/angular-ui/ng-grid-2.0.7.debug.js"></script> 
+ 	<script src="../lib/angular-ui/ng-grid-flexible-height.js"></script> 
+ 	
+    <!-- Angular UI -->
+    <script src="../lib/angular-ui/angular-ui.js"></script>
+   	<script src="../lib/angular-ui/ui-bootstrap-tpls-0.2.0.js"></script>
+   	<link rel="stylesheet" href="../lib/angular-ui/angular-ui.css" type="text/css"/>
+   	<link rel="stylesheet" href="../lib/angular-ui/ng-grid.min-2.0.7.css" type="text/css"/>
+   	
+   	
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap-customized.css" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap-responsive-customized.css"  type="text/css"/>
+	<script src="../lib/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../lib/q/q.js"></script>
+    
+	<!-- Select2 -->
+    <script src="../lib/select2/select2.js"></script>
+    <link rel="stylesheet" href="../lib/select2/select2.css" type="text/css"/>
+	<link rel="stylesheet" href="../lib/select2/customselect2.css" type="text/css"/>	
+<!-- 	<script src="../lib/angular-ui/select2.js"></script> -->
+
+    <!-- Espace utils -->
+    <script src="../lib/espace/utils.js"></script>
+    <script src="../lib/usng/usng.js"></script>
+    <script src="../lib/espace/preference-store.js"></script>
+    <script src="../lib/espace/document-preference-store.js"></script>
+    <!-- <script src="js/queryStore.js"></script> -->
+
+	<!-- Graph widget stuff -->
+    <script src="../lib/d3/d3.v3.min.js" charset="utf-8"></script>
+	<script src="js/topojson.js" charset="utf-8"></script>
+	<script src="js/graph.js" charset="utf-8"></script>
+
+    <!-- Directives -->
+     <script src="js/main-controller.js" charset="utf-8"></script>
+
+
+	<!-- Widget Style -->
+	<link rel="stylesheet" href="../lib/espace/css/espace.css"  type="text/css"/>
+	<link rel="stylesheet" href="css/main.css" type="text/css"/>
+
+</head>
+<body id="ng-app" ng-app="LinksandNodes" ng-init = "currentTab.value = 'Directed'">
+	<div id="ng-controller" ng-controller="LinksandNodesController" ng-switch on="currentTab.value" >
+	
+		<div class="container-fluid">
+			<div class="row-fluid">
+						
+		<!-- Left Selection Pane -->	
+				<div class="span2">
+					<div ng-include src="'html/selection.html'"></div>
+    			</div> 
+		<!-- End Left Selection Pane -->
+			
+				<div class="span8">		
+ 					<div ng-include src="'html/vis.html'"></div>
+				</div>
+				
+		<!-- Right Data Pane -->
+				<div class="span2">
+					<div ng-include src="'html/output.html'"></div>				
+				</div>
+		<!-- End Right Data Pane -->
+						
+			</div>
+		</div>
+	</div>
+
+</body>
+	
+</html>
+

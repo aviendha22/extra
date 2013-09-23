@@ -1,0 +1,53 @@
+{
+"vertices":[
+{"_id":0, "Name":"Saturn", "Type":"Titan"},
+{"_id":1, "Name":"Jupiter", "Type":"God"},
+{"_id":2, "Name":"Neptune", "Type":"God"},
+{"_id":3, "Name":"Pluto", "Type":"God"},
+{"_id":4, "Name":"Sky", "Type":"Location"},
+{"_id":5, "Name":"Sea", "Type":"Location"},
+{"_id":6, "Name":"Tartarus", "Type":"Location"},
+{"_id":7, "Name":"Hercules", "Type":"Demigod"},
+{"_id":8, "Name":"Alcmene", "Type":"Human"},
+{"_id":9, "Name":"Nemean", "Type":"Monster"},
+{"_id":10, "Name":"Hydra", "Type":"Monster"},
+{"_id":11, "Name":"Cerberus", "Type":"Monster"}
+],
+"edges":[
+{"_id":12, "input":1, "out":0, "label":"Father"},
+{"_id":13, "input":4, "out":1, "label":"Lives"},
+{"_id":16, "input":3, "out":1, "label":"Brother"},
+{"_id":17, "input":1, "out":3, "label":"Brother"},
+{"_id":14, "input":2, "out":1, "label":"Brother"},
+{"_id":15, "input":1, "out":2, "label":"Brother"},
+{"_id":24, "input":2, "out":0, "label":"Father"},
+{"_id":30, "input":3, "out":0, "label":"Father"},
+{"_id":20, "input":5, "out":2, "label":"Lives"},
+{"_id":19, "input":3, "out":2, "label":"Brother"},
+{"_id":18, "input":2, "out":3, "label":"Brother"},
+{"_id":23, "input":11, "out":3, "label":"Pet"},
+{"_id":21, "input":6, "out":3, "label":"Lives"},
+{"_id":22, "input":6, "out":11, "label":"Lives"},
+{"_id":25, "input":7, "out":8, "label":"Mother"},
+{"_id":26, "input":9, "out":7, "label":"Battled"},
+{"_id":27, "input":10, "out":7, "label":"Battled"},
+{"_id":28, "input":11, "out":7, "label":"Battled"},
+{"_id":29, "input":7, "out":1, "label":"Father"}
+],
+"colors":
+    {
+    "God":"#99CC00",
+    "Titan":"#FF3300",
+    "Human":"#CC33FF",
+    "Demigod":"#3333CC",
+    "Monster":"#FF9900",
+    "Location":"#009900",
+    "Brother":"#8d9c06",
+    "Lives":"#007ab7",
+    "Mother":"#ae0a94",
+    "Battled":"#E01B81",
+    "Pet":"#E0AF1B",
+    "Father":"#1BE0A8"
+    }
+}
+
