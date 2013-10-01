@@ -10,6 +10,7 @@ var m_count = 0;
 
 var entity1Color = '#333399';
 var entity2Color = '#339966';
+var bothColor = '#ff99ff';
 
 var indexOfObj = function(array, value, attribute){
 	for (var i = 0; i < array.length; i++){
@@ -21,13 +22,16 @@ var indexOfObj = function(array, value, attribute){
 	return -1;
 };
 
-//var limit = parseInt(process.argv[2], 10);
+var limit = parseInt(process.argv[2], 10);
 request('http://everest-build:8081/assertion/', function(error, response, body){
 	if (error){
 		console.log(error);
 	} else {
 		var data = JSON.parse(body);
-		data.forEach(function(assertion){
+		console.log(data.length);
+		for (var i = 0; i < limit; i++){
+		var assertion = data[i];
+			
 			var m = {
 				mongo_ar_id: assertion.alpha_report_id,
 				mongo_rep_id: assertion.reporter_id,
@@ -52,8 +56,7 @@ request('http://everest-build:8081/assertion/', function(error, response, body){
 				name: assertion.entity1,
 				type: 'entity1',
 				color: entity1Color,
-				mCount: m.count,
-				count: e_count++
+				mCount: m.count
 			};
 			
 			var entity2 = {
@@ -62,10 +65,39 @@ request('http://everest-build:8081/assertion/', function(error, response, body){
 				name: assertion.entity2,
 				type: 'entity2',
 				color: entity2Color,
-				mCount: m.count,
-				count: e_count++
+				mCount: m.count
 			};
 			
+			var en1 = indexOfObj(vertices, entity1.name, 'name');
+			var ea1 = indexOfObj(vertices, entity1.mongo_ar_id, 'mongo_ar_id');
+			
+			var en2 = indexOfObj(vertices, entity2.name, 'name');
+			var ea2 = indexOfObj(vertices, entity2.mongo_ar_id, 'mongo_ar_id')
+			
+			if (en1 === -1 || ea1 === -1){
+				entity1.count = e_count++;
+				vertices[entity1.count] = entity1;
+			} else {
+				entity1.count = vertices[en1].count;
+				
+				if (vertices[en1].type === 'entity2'){
+					vertices[en1].type = 'both';
+					vertices[en1].color = bothColor;
+				}
+			}
+			
+			if ( en2 === -1 || ea2 === -1){
+				entity2.count = e_count++;
+				vertices[entity2.count] = entity2;
+			} else {
+				entity2.count = vertices[en2].count;
+				
+				if (vertices[en2].type === 'entity1'){
+					vertices[en2].type = 'both';
+					vertices[en2].color = bothColor;
+				}
+			}
+				
 			var relationship = {
 				mongo_ar_id: assertion.alpha_report_id,
 				mondo_assert_id: assertion._id,
@@ -73,28 +105,18 @@ request('http://everest-build:8081/assertion/', function(error, response, body){
 				source: entity1.count,
 				target: entity2.count
 			};
-			 
-			vertices[entity1.count] = entity1;
-			vertices[entity2.count] = entity2;
+			
 			edges.push(relationship);
-		});
-	}
-	var json;
-	//if (limit === undefined){
-		json = {
-			metadata : metadata,
-			vertices : vertices,
-			edges	 : edges
-		};
-	/*} else {
-		json = {
-			metadata : metadata.slice(0,limit),
-			vertices : vertices.slice(0,2*limit),
-			edges	 : edges.slice(0,limit)
 		};
 	}
-	*/
-	fs.writeFile('./json/assertions.json', JSON.stringify(json), function(err){
+	var json = {
+		metadata : metadata,
+		vertices : vertices,
+		edges	 : edges
+	};
+
+	
+	fs.writeFile('./json/assertions-' + limit +'.json', JSON.stringify(json), function(err){
 		if(err){
 			console.log(err);
 		} else {

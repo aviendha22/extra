@@ -1531,3 +1531,88 @@ $.ajax({
 		} 
 	}			
 });
+
+data_table.js
+
+//grab the x coordinate of the center of the element in the dom with id tag
+me.getCenter = function(tag){
+	var width = d3.select(tag).style('width');
+	width = width.split('px')[0];
+	return parseInt(width,10)/2;
+}
+
+/*Allows for automatic resizing and recentering of all objects within the
+widget when the window/frame is resized */
+me.setLocations = function(){
+	var center = me.getCenter('.data_table_hold');
+	var text_center = me.getCenter('.data_table_text');
+	var input_center = me.getCenter('.data_table_inputs');
+
+	//push title and inputs over until they are centered
+	d3.select('.data_table_text').style('margin-left', (center - text_center) + 'px');
+	d3.select('.data_table_inputs').style('margin-left', (center - input_center) + 'px');
+
+	//expand the table until it takes up entire width of frame
+	d3.select('.data_table_container').style('width', (center * 2) + 'px');
+	d3.select('.data_table_data').style('width', (center * 2 - 15) + 'px');
+	//d3.select('.data_table_headers').style('width', (center * 2 - 15) + 'px');
+}
+
+me.adjustDataWidths = function(){
+	var rowData = d3.select('tr').selectAll('td')[0];
+	var heads = d3.selectAll('th')[0];
+	for (var i = 0; i < rowData.length; i++){
+		var rowWidth = parseInt(d3.select(rowData[i]).style('width').split('px')[0], 10);
+		var headerWidth = parseInt(d3.select(heads[i]).style('width').split('px')[0], 10);
+		if (rowWidth > headerWidth){
+			d3.select(heads[i]).style('width', rowWidth + 'px');
+		} else if (headerWidth > rowWidth){
+			d3.selectAll('tr').each(function(d,j){
+				var c = d3.select(this).selectAll('td')[0][i];
+				d3.select(c).style('width', headerWidth + 'px');
+			});
+		}
+	}
+};
+
+me.getPageNumbers = function(current, last){
+	var maxNumPages = 8; 		
+	var nums = [], j = 0;
+		
+	//if there are less pages than the max number of pages to show
+	if (last <= maxNumPages){
+		for (var i = 0; i < last; i++){ nums[i] = i+1; }
+		return nums;
+	}
+	
+	//if on page at least half the max number of pages to show above page 1
+	if (current - (maxNumPages / 2) > 1){
+		nums[j] = 1;
+		nums[j+1] = '...';
+		j += 2;
+	}
+	
+	var low = Math.max(1, current - (maxNumPages / 2));
+	var high = Math.min(last, low + maxNumPages - 1 - j);
+	
+	for (var i = low; i <= high; i++){
+		nums[j] = i;
+		j++;
+	}
+	
+	//if on page at least half the max number of pages below last page
+	if (current + (maxNumPages / 2) - j <= last){
+		nums[j] = '...';
+		nums[j+1] = last;
+	}
+	
+	return nums;
+};
+
+raw_data.js
+
+d3.selectAll('input').on('change', function(){
+	raw_data_table.setMaxRows(parseInt(this.value,10));
+	raw_data_table.page = 0;
+	table.render();
+});
