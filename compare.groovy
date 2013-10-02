@@ -1,8 +1,12 @@
-println "start";
-//change database to command line arg
-TitanGraph graph = TitanFactory.open('./databases/assertions-200b/');
+try {
+    a1
+} catch (MissingPropertyExceptionmpe){
+    println "Please provide a directory for the database"
+    System.exit(0);
+}
 
-println "after load";
+TitanGraph graph = TitanFactory.open(a1);
+
 def alpha_reports = graph.V.has('name', 'alpha report');
 def target_events = graph.V.has('name', 'target event');
 
@@ -150,6 +154,3 @@ for (int i = 0 ; i < ars.size(); i++){
 
 println count;
 graph.commit();
-
-println "end";
-println "dont forget to graph.commit";
