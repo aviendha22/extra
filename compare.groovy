@@ -5,21 +5,6 @@ try {
     System.exit(0);
 }
 
-TitanGraph graph = TitanFactory.open(a1);
-
-def alpha_reports = graph.V.has('name', 'alpha report');
-def target_events = graph.V.has('name', 'target event');
-
-def ars = alpha_reports.toList();
-def tes = target_events.toList();
-
-def count = 0;
-
-def getVertexCountById(id){
-    return graph.v(id).inE.outV.count();
-};
-
-
 def getMatchingVertices(id, array, graph){
     def verts = [];
     for (int i = 0; i < array.size(); i++){
@@ -116,7 +101,7 @@ def getScore(ar_id, te_id, graph){
     return score;
 };
 
-def compareTeToAr(){
+def compareTeToAr(ars, tes, count, graph){
     for (int i = 0 ; i < ars.size(); i++){
         for (int j = 0; j < tes.size(); j++){ 
             count++;    
@@ -146,54 +131,65 @@ def compareTeToAr(){
                     ars[i].comparedTo = comparedTo;
                 } else {
                     //this target event has been compared to this alpha report
-                    println "Score already exists: "+found.score;
+                    println "Target Event "+tes[j].id+ " matches Alpha Report " +ars[i].id+ " with a score of "+found.score;
                 }
             }
         }
+	graph.commit();
+	//println count;
     }
-    graph.commit();
 }
 
-def compareArToAr(){
+def compareArToAr(ars, count, graph){
     for (int i = 0 ; i < ars.size(); i++){
-        for (int j = i+1; j < ars.size(); j++){ 
-            count++;    
-            if ( ars[i].comparedTo == null ){
-                println "never been compared";
-                def score = getScore(ars[i], ars[j], graph);
-                ars[i].comparedTo = [[alpha_report_id: ars[j].id, score: score]];
-            } else {
-                println "compared before";
-                def comparedTo = ars[i].comparedTo;
+        for (int j = i + 1; j < ars.size(); j++){ 
+		count++;    
+	        if ( ars[i].comparedTo == null ){
+            	//println "never been compared";
+                	def score = getScore(ars[i], ars[j], graph);
+	                ars[i].comparedTo = [[alpha_report_id: ars[j].id, score: score]];
+        	} else {
+                	//println "compared before " + i + " " + j;
+	                def comparedToI = ars[i].comparedTo;
+                	
+			//check to see if this target event has been compared to this alpha report
+	                def found = [ alpha_report_id: -1, score: -1 ];
+        	        
+                	for (int k = 0; k < comparedToI.size(); k++){
+	                    if (comparedToI[k].alpha_report_id == ars[j].id){
+        	                found.score = comparedToI[k].score;
+                	        found.alpha_report_id = comparedToI[k].alpha_report_id;
+	                        break;
+        	            }
+                	}
                 
-                //check to see if this target event has been compared to this alpha report
-                def found = [ alpha_report_id: -1, score: -1 ];
-                
-                for (int k = 0; k < comparedTo.size(); k++){
-                    if (comparedTo[k].alpha_report_id == ars[j].id){
-                        found.score = comparedTo[k].score;
-                        found.alpha_report_id = comparedTo[k].alpha_report_id;
-                        break;
-                    }
-                }
-                
-                if (found.alpha_report_id == -1){
-                    //alpha report j has not been compared to alpha report i
-                    def score = getScore(ars[i], ars[j], graph);                
-                    comparedTo.push([alpha_report_id: ars[j].id, score: score]);
-                    ars[i].comparedTo = comparedTo;
-                } else {
-                    //this target event has been compared to this alpha report
-                    println "Score already exists: "+found.score;
-                }
-            }
+	                if (found.alpha_report_id == -1){
+        	            //alpha report j has not been compared to alpha report i
+                	    def score = getScore(ars[i], ars[j], graph);                
+	                    comparedToI.push([alpha_report_id: ars[j].id, score: score]);
+        	            ars[i].comparedTo = comparedToI;
+                	} else {
+	                    //this target event has been compared to this alpha report
+				if (found.score > 4){
+                			println "Alpha Report " +ars[i].id+ " matches Alpha Report " +ars[j].id+ " with a score of " + found.score;
+				}
+			}
+        	}
         }
+	graph.commit();
+	println count;
     }
-    graph.commit();
 }
 
-compareTeToAr();
-println count;
+TitanGraph graph = TitanFactory.open(a1);
 
-compareArToAr();
-println count;
+def alpha_reports = graph.V.has('name', 'alpha report');
+//def target_events = graph.V.has('name', 'target event');
+
+def ars = alpha_reports.toList();
+//def tes = target_events.toList();
+
+def count = 0;
+
+//compareTeToAr(ars, tes, count, graph);
+compareArToAr(ars, count, graph);
