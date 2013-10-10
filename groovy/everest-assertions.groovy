@@ -1,12 +1,27 @@
-import groovy.json.JsonSlurper
-String fileContents = new File('../node/json/assertions-2000.json').text;
+import groovy.json.JsonSlurper;
+
+try {
+	a1
+} catch (MissingPropertyExceptionmpe){
+	println "Please provide a json file for the database"
+	System.exit(0);
+}
+
+try {
+	a2
+} catch (MissingPropertyExceptionmpe){
+	println "Please provide a directory for the database"
+	System.exit(0);
+}
+
+String fileContents = new File(a1).text;
 
 def assertions = new JsonSlurper().parseText(fileContents);
 def metadata = assertions.get('metadata');
 def vertices = assertions.get('vertices');
 def edges = assertions.get('edges');
 
-TitanGraph graph = TitanFactory.open('../databases/assertions-2000a');
+TitanGraph graph = TitanFactory.open(a2);
 
 for (int i = 0; i < metadata.size(); i++){
 	Vertex v = graph.addVertex(null);
