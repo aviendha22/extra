@@ -44,9 +44,19 @@ var addAssertionToTitan = function(ar, assertion_object){
     return [v1, v2];
 }
 
-gremlin.SetGraph(graphDB);
-gremlin.V('name', 'alpha report').consoleOut();
+var compareToAlphaReports = function(ar){
+	var alphas = gremlin.V().has('name', 'alpha report').toJSON();
+	
+	alphas.forEach(function(d){
+		//compare ar and d
+		
+		//add comparison to ar.comparedTo
+		
+		//add comparison to d.comparedTo
+	});
+};
 
+gremlin.SetGraph(graphDB);
 
 var pretendAR = {
 	raw_data_id: "1",
@@ -73,5 +83,6 @@ var pretendAssertion = {
 
 var meta = addAlphaReportToTitan(pretendAR);
 addAssertionToTitan(meta, pretendAssertion);
+compareToAlphaReports(meta);
 
 graphDB.shutdownSync();
