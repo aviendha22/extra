@@ -1,53 +1,57 @@
-var titanAddress = 'http://everest-build:8182/graphs/graph';
+var titanAddress = 'http://localhost:8182/graphs/graph';
 
 /**
 	GET
 */
-exports.getAllEdges = function(){
+var getAllEdges = function(){
 	return titanAddress + '/tp/gremlin?script=g.E';
 };
 
-exports.getAllVertices = function(){
+var getAllVertices = function(){
 	return titanAddress + '/tp/gremlin?script=g.V';
 };
 
-exports.getEdgeById = function(id){
+var getEdgeById = function(id){
 	return titanAddress + '/edges/' + id;
 };
 
-exports.getVertexById = function(id){
+var getVertexById = function(id){
 	return titanAddress + '/vertices/' + id;
 };
 
-exports.getGroupById = function(id){
+var getGroupById = function(id){
 	return titanAddress+'/tp/gremlin?script=g.v(' + id + ').inE.outV';
 };
 
-exports.getVertexNamesById = function(id){
+var getVertexNamesById = function(id){
 	return titanAddress+'/tp/gremlin?script=g.v(' + id + ').inE.outV.name';
 };
 
-exports.getEdgeLabelsById = function(id){
+var getEdgeLabelsById = function(id){
 	return titanAddress+'/tp/gremlin?script=g.v(' + id + ').inE.outV.inE.label';
 };
 
-exports.getGroupPathById = function(id){
-	return titanAddress+'/tp/gremlin?script=g.v(' + id + ').inE.outV.outE.inV.path';
+var getGroupPathById = function(id, name){
+	if (name === 'alpha report' || name === 'target event'){
+		return titanAddress+'/tp/gremlin?script=g.v(' + id + ').inE.outV.outE.inV.path';
+	} else {
+		return titanAddress+'/tp/gremlin?script=g.v(' + id + ').out.in.outE.inV.path';
+	}
 };
 
-exports.getGroupVertexCountById = function(id){
+var getGroupVertexCountById = function(id){
 	return titanAddress+'/tp/gremlin?script=g.v(' + id + ').inE.outV.count()';
 };
 
-exports.getGroupEdgeCountById = function(id){
+var getGroupEdgeCountById = function(id){
 	return titanAddress+'/tp/gremlin?script=g.v(' + id + ').inE.outV.inE.count()';
 };
 
-exports.getAssertionsById = function(id){
+var getAssertionsById = function(id){
 	return titanAddress+'/tp/gremlin?script=g.v(' + id + ').inE.outV.inE.outV.path';
 };
 
-exports.getMatchingVertices = function(id, array){
+var getMatchingVertices = function(id, array){
 	var query = titanAddress+'/tp/gremlin?script=g.v(' + id + ').inE.outV.or(';
 	array.forEach(function(d){
 		query += '_().has("name","' + d + '"),';
@@ -57,7 +61,7 @@ exports.getMatchingVertices = function(id, array){
 	return query;
 };
 
-exports.getMatchingEdges = function(id, array){
+var getMatchingEdges = function(id, array){
 	var query = titanAddress+'/tp/gremlin?script=g.v(' + id + ').inE.outV.inE.or(';
 	array.forEach(function(d){
 		query += '_().has("label","' + d + '"),';
@@ -66,30 +70,21 @@ exports.getMatchingEdges = function(id, array){
 	return query;
 };
 
-exports.getMatchingOrientation = function(id, array){
+var getMatchingOrientation = function(id, array){
 	var query = titanAddress+'/tp/gremlin?script=g.v(' + id + ').inE.outV.or(';
 	array.forEach(function(d){
 		query += '_().has("name","' + d[0].name + 
 			'").inE.has("label","' + d[1]._label + 
-			'").outV.has("name","' + d[2].name + '"),'
+			'").outV.has("name","' + d[2].name + '"),';
 	});
 	return query.substr(0, query.length - 1) + ')';
 };
 
-exports.buildKeyValueCountQuery = function(key, value){
-	return titanAddress+'/tp/gremlin?script=g.V.has("' + key + '","' + value + '").count()';
-};
-
-exports.buildKeyValueQuery = function(key, value, start, end){
-	start = start === undefined ? 0 : start;
-	end = end === undefined ? start + 9 : end;
-	return titanAddress+'/tp/gremlin?script=g.V.has("' + key + '","' + value + '")[' + start + '..' + end + ']';
-};
 
 /**
 	POST / Create
 */
-exports.buildEdge = function(lObj){
+var buildEdge = function(lObj){
 	var outV = lObj.source;
 	var inV = lObj.target;
 	var query = titanAddress + '/edges';
@@ -110,13 +105,12 @@ exports.buildEdge = function(lObj){
 			query += '&';
 		}
 	});
-	//console.log(query.replace('#', ''));
 	query = query.replace('#', '');
 	query = query.replace('+', 'plus');
 	return query;
 };
 
-exports.buildNode = function(cObj){
+var buildNode = function(cObj){
 	var query = titanAddress + '/vertices';
 	
 	if (cObj._titan_id !== undefined ) {
@@ -140,12 +134,20 @@ exports.buildNode = function(cObj){
 	return query;
 };
 
+var buildKeyValueCountQuery = function(key, value){
+	return titanAddress+'/tp/gremlin?script=g.V.has("' + key + '","' + value + '").count()';
+};
 
+var buildKeyValueQuery = function(key, value, start, end){
+	start = start === undefined ? 0 : start;
+	end = end === undefined ? start + 9 : end;
+	return titanAddress+'/tp/gremlin?script=g.V.has("' + key + '","' + value + '")[' + start + '..' + end + ']';
+};
 
 /**
 	POST / Update
 */
-exports.updateVertexQuery = function(id, obj){
+var updateVertexQuery = function(id, obj){
 	console.log(obj);
 	return titanAddress + '/vertices/' + id + '?comparedTo=' + JSON.stringify(obj);
 };
