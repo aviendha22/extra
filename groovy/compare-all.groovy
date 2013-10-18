@@ -106,11 +106,19 @@ def compareTeToAr(ars, tes, count, graph){
 		for (int j = 0; j < tes.size(); j++){
 			count++;
 			if ( ars[i].comparedTo == null ){
-				//println "never been compared";
+				println "never been compared";
 				def score = getScore(ars[i], tes[j], graph);
 				ars[i].comparedTo = [[item_id: tes[j].id, score: score]];
+
+				if ( tes[j].comparedTo == null ){
+					tes[j].comparedTo = [[item_id: ars[i].id, score: score]];
+				} else {
+					def comparedToJ = tes[j].comparedTo;
+					comparedToJ.push([item_id: ars[i].id, score: score]);
+					tes[j].comparedTo = comparedToJ;
+				}
 			} else {
-				//println "compared before";
+				println "compared before";
 				def comparedTo = ars[i].comparedTo;
 				
 				//check to see if this target event has been compared to this alpha report
@@ -129,6 +137,14 @@ def compareTeToAr(ars, tes, count, graph){
 					def score = getScore(ars[i], tes[j], graph);
 					comparedTo.push([item_id: tes[j].id, score: score]);
 					ars[i].comparedTo = comparedTo;
+
+					if (tes[j].comparedTo == null){
+						tes[j].comparedTo = [[item_id: ars[i].id, score: score]];
+					} else {
+						def comparedToJ = tes[j].comparedTo;
+						comparedToJ.push([item_id: ars[i].id, score: score]);
+						tes[j].comparedTo = comparedToJ;
+					}
 				} else {
 					//this target event has been compared to this alpha report
 					println "Target Event "+tes[j].id+ " matches Alpha Report " +ars[i].id+ " with a score of "+found.score;
@@ -136,7 +152,7 @@ def compareTeToAr(ars, tes, count, graph){
 			}
 		}
 	graph.commit();
-	//println count;
+	println count;
 	}
 }
 
@@ -192,6 +208,7 @@ def ars = alpha_reports.toList();
 def tes = target_events.toList();
 
 def count = 0;
-
+println ars.size();
+println tes.size();
 compareTeToAr(ars, tes, count, graph);
 compareArToAr(ars, count, graph);

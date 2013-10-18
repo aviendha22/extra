@@ -29,6 +29,7 @@ for (int i = 0; i < metadata.size(); i++){
 	keys.each{
 		v.setProperty(it, metadata[i].get(it));
 	}
+	v.setProperty('comparedTo', []);
 	println v.id;
 	metadata[i]._titan_id = v.id;
 }
